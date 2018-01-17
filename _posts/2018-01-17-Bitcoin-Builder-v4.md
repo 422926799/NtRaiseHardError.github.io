@@ -43,7 +43,7 @@ The overall view of the file shows us that it has a relatively high entropy at 7
 
 ![pestudio](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-15-28-28.png)
 
-The strings gives us some clues tot he functionality of this program. From before, we can see that the entropy may have been a result of an encryption process as it uses the `System.Security.Cryptography` linbrary and there is a reference to a `CreateDecryptor` which may likely be what deobfuscates that unknown high-entropy data. There is also a reference to the `System.Reflection` library which might hint at dynamically loading another .NET application with the `Assembly.Load(pe_file_array).Entry.Invoke()` method.
+The strings gives us some clues tot he functionality of this program. From before, we can see that the entropy may have been a result of an encryption process as it uses the `System.Security.Cryptography` linbrary and there is a reference to a `CreateDecryptor` which may likely be what deobfuscates that unknown high-entropy data. There is also a reference to the `System.Reflection` library which might hint at dynamically loading another .NET application with the `Assembly.Load(pe_file_array).EntryPoint.Invoke()` method.
 A couple of interesting strings as well. There is a debug string here that shows that the project may have likely been created using Microsoft Visual Studio 2012 with the default WinForms project with name of `WindowsApplication4`.
 
 From here, we can decompile and analyse this file using `dnSpy`. I prefer this over `ILSpy` simply beacuse it can handle any potential obfuscation which would otherwise "break" `ILSpy`'s decompiler as well as having slightly improved features, not to mention the debugging capabilities which I can immediately jump into without having to load another application.
@@ -72,7 +72,7 @@ To see where _this_ code is referenced in the program, right-click the method na
 
 On line 34, we can see where the call to retrieve the `Encrypt` resource lies. If we follow the assigned variable `encrypt`, we can see it being referenced on line 46 with a call to `GStruct0.rijndaelManaged_0.CreateDecryptor().TransformFinalBlock(encrypt, 0, encrypt.Length);` which is then assigned to the variable `byte_` which is most likely where we can obtain the unobfuscated data. Let's place a breakpoint here.
 
-Before we extract the data, I mentioned something about using the `System.Reflection` library to dynamically load another .NET executable using the `Assembly.Load(pe_file_array).Entry.Invoke()` method so let's see where this lies in the code. Assuming the obfuscated data is a .NET execuable file, we can trace the references of the `byte_` array and then successive variables until we reach the section of code where it executes.
+Before we extract the data, I mentioned something about using the `System.Reflection` library to dynamically load another .NET executable using the `Assembly.Load(pe_file_array).EntryPoint.Invoke()` method so let's see where this lies in the code. Assuming the obfuscated data is a .NET execuable file, we can trace the references of the `byte_` array and then successive variables until we reach the section of code where it executes.
 
 ![dnSpy](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-07-04.png)
 
