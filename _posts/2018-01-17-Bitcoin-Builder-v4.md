@@ -100,7 +100,7 @@ Let's get back on track and attempt to dump the obfuscated data. Press the `Star
 
 Let's open it in `pestudio` to see what's up.
 
-![pestudio](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-43-42.png
+![pestudio](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-43-42.png)
 
 High detection rate (57/68) and keylogger traits. This might indicate that we're at the end of the unpacking.
 
