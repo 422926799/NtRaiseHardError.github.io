@@ -3,7 +3,7 @@ layout: post
 title: Unpacking Bitcoin Builder v4
 ---
 
-The following post details the unpacking of a programmed `Bitcoin_Builder.v4.exe`. The sample can be obtained on [Hybrid Analysis](https://www.hybrid-analysis.com/sample/9d4ba009a5dd353d2177e32dbcbb525738e1f6d001bccc470576b90b0303975a?environmentId=100).
+The following post details the unpacking of the program `Bitcoin_Builder.v4.exe`. The sample can be obtained on [Hybrid Analysis](https://www.hybrid-analysis.com/sample/9d4ba009a5dd353d2177e32dbcbb525738e1f6d001bccc470576b90b0303975a?environmentId=100).
 
 ## Static Analysis
 
