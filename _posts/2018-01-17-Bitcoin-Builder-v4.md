@@ -25,7 +25,7 @@ So since we have some interesting resources in this application, we'll open it u
 
 ![reshacker](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-15-15-53.png)
 
-Opening the `APPLICATION.EXE` resource immediately shows us data with a PE file's signatures and structure `MZ` magic, the DOS stub, the `PE\0\0` signature and some common header names respectively. We definitely want to have a look at this so let's save the resource by right-clicking `APPLICATION.EXE` in the tree view and selecting to save the resource.
+Opening the `APPLICATION.EXE` resource immediately shows us data with a PE file's signatures and structure `MZ` magic, the DOS stub, the `PE\0\0` signature and some common section header names respectively. We definitely want to have a look at this so let's save the resource by right-clicking `APPLICATION.EXE` in the tree view and selecting to save the resource.
 
 ![reshacker](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-15-15-57.png)
 
