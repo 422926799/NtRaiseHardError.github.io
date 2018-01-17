@@ -80,7 +80,7 @@ On line 64 we can see a reference to `byte_` and from there, it is assigned to `
 
 ![dnSpy](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-15-18.png)
 
-So it appears that there are three strings listed that are obfuscated with some funky characters but each of these passed as a parameter in a call to `Module1.smethod_2` which we can only assume is the decoding function. Let's check it out.
+So it appears that there are three strings listed that are obfuscated with some funky characters but each of these are passed as a parameter in a call to `Module1.smethod_2` which we can only assume is the decoding function. Let's check it out.
 
 ![dnSpy](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-24-39.png)
 
