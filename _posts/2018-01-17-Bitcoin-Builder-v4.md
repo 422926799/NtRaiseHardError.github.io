@@ -108,7 +108,7 @@ High detection rate (57/68) and keylogger traits. This might indicate that we're
 
 A lot of suspicious strings, some that verify keylogging functionality. We also have some very identifiable strings that may tell us what kind of malware it is AKA `Bladabindi` or `njRAT`. Let's confirm with the VirusTotal scans.
 
-![dnSpy](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-42-47.png)
+![dnSpy](/images/2018-01-17-Bitcoin-Builder-v4/Windows%207%20x64%20Malnalysis-2018-01-17-17-44-18.png)
 
 Yep! Many detections saying `Bladabindi`.
 
