@@ -8,4 +8,4 @@ Personal blog to keep a journal of my adventures as a Windows reverse engineer a
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+Nothing to see here! (yet)
