@@ -44,7 +44,7 @@ Execution of a Hooked Function Call
 +---------+                       +--------------+                    + ------->  +----------+
 | Program | -- calls function --> | Intermediate | | execution        |           | Function |  | execution
 +---------+                       |   Function   | | of             calls         |    .     |  | of
-                                  |       .      | | hooked         normal        |    .     |  | function
+                                  |       .      | | intermediate   normal        |    .     |  | function
                                   |       .      | | function      function       |    .     |  |
                                   |       .      | v                  |           |          |  v
                                   +--------------+  ------------------+           +----------+
