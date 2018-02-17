@@ -56,7 +56,7 @@ This can be separated into three steps. To demonstrate this process, the WinAPI 
 
 1. Hooking the function
 
-To hook the function, we first require the intermediate function which **must** replicate the targetted function. Microsoft Developer Network (MSDN) defines `MessageBox` as the following:
+To hook the function, we first require the intermediate function which **must** replicate parameters of the targetted function. Microsoft Developer Network (MSDN) defines `MessageBox` as the following:
 
 ```c
 int WINAPI MessageBox(
