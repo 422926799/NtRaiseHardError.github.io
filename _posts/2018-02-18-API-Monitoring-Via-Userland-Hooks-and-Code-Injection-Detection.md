@@ -75,7 +75,7 @@ int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT u
 }
 ```
 
-Once this exists, execution flow has somewhere to where the code will be redirected or _jumped_. To actually _hook_ the `MessageBox` function, the first few bytes of the code can be _patched_ (keep in mind that the original bytes must be saved so that the function may be restored for when the intermediate function is finished). Here is the original assembly instructions of the function as represented in its corresponding module `user32.dll`:
+Once this exists, execution flow has somewhere for the code to be redirected. To actually _hook_ the `MessageBox` function, the first few bytes of the code can be _patched_ (keep in mind that the original bytes must be saved so that the function may be restored for when the intermediate function is finished). Here are the original assembly instructions of the function as represented in its corresponding module `user32.dll`:
 
 ```asm
 ; MessageBox
@@ -104,7 +104,7 @@ int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT u
 }
 ```
 
-`szMyText` can be used to replace the `LPCTSTR lpText` parameter of `MessageBox`. 
+`szMyText` can be used to replace the `LPCTSTR lpText` parameter of `MessageBox`.
 
 3. Resuming normal execution
 
