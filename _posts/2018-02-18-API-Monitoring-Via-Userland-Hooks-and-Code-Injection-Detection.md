@@ -218,7 +218,7 @@ DLL injection via the [CreateRemoteThread](https://msdn.microsoft.com/en-us/libr
 
 ```c++
 void injectDll(const HANDLE hProcess, const std::string dllPath) {
-	LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	
 	DWORD dwWritten = 0;
 	::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
