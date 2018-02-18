@@ -246,7 +246,7 @@ void injectDll(const HANDLE hProcess, const std::string dllPath) {
 	
     ::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
   
-    HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
+    HMODULE hModule = ::GetModuleHandle(TEXT("kernel32.dll"));
   
     LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");      // LoadLibraryA for ASCII string
   
@@ -396,7 +396,7 @@ int main() {
     
     ::WriteProcessMemory(hProcess, lpLoadLibraryParam, dllPath.data(), dllPath.length(), &dwWritten);
     
-    ::QueueUserAPC((PAPCFUNC)::GetProcAddress(::GetModuleHandleA("kernel32.dll"), "LoadLibraryA"), hThread, (ULONG_PTR)lpLoadLibraryParam);
+    ::QueueUserAPC((PAPCFUNC)::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "LoadLibraryA"), hThread, (ULONG_PTR)lpLoadLibraryParam);
     
     return 0;
 }
