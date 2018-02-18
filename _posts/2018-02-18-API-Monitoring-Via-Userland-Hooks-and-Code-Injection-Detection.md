@@ -21,7 +21,7 @@ In the present day, malware are developed by cyber-criminals with the intent of 
 
 ## Inline Hooking
 
-Inline hooking is the act of detouring the flow of code via _hotpatching_. Hotpatching is defined as the modification of code during the runtime of an executable image<sup>[1]</sup>. The purpose of inline hooking is to be able to capture the instance of when the program calls a function and then form there, observation and/or manipulation of the call can be accomplished. Here is a visual representation of how normal execution works:
+Inline hooking is the act of detouring the flow of code via _hotpatching_. Hotpatching is defined as the modification of code during the runtime of an executable image<sup>[1]</sup>. The purpose of inline hooking is to be able to capture the instance of when the program calls a function and then from there, observation and/or manipulation of the call can be accomplished. Here is a visual representation of how normal execution works:
 
 ```
 Normal Execution of a Function Call
@@ -121,6 +121,15 @@ int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT u
     return MessageBox(hWnd, szMyText, lpCaption, uType);
 }
 ```
+
+If rejecting the call to `MessageBox` was desired, it is as easy as returning a value, preferrably one that is defined in the documentation. For example, to return the "No" option from a "Yes/No" dialog, the intermediate function can be:
+
+```c
+int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType) {
+    return IDNO;  // IDNO defined as 7
+}
+```
+
 
 ## API Monitoring
 
