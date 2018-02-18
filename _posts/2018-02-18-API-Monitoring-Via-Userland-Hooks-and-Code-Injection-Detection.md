@@ -406,11 +406,11 @@ One major difference between this and `CreateRemoteThread` is that `QueueUserAPC
 
 ### Process Hollowing
 
-...
+Process hollowing, AKA RunPE, is a popular method used to bypass anti-virus detection. It allows executable files to be loaded into a target process and executed under its context.
 
 ----
 
-### References:
+# References:
 
 * [1] https://www.blackhat.com/presentations/bh-usa-06/BH-US-06-Sotirov.pdf
 * [2] https://www.codeproject.com/Articles/7914/MessageBoxTimeout-API
