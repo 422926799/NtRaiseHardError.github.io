@@ -244,7 +244,6 @@ DLL injection via the [CreateRemoteThread](https://msdn.microsoft.com/en-us/libr
 void injectDll(const HANDLE hProcess, const std::string dllPath) {
     LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	
-    DWORD dwWritten = 0;
     ::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
   
     HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
@@ -384,6 +383,28 @@ HHOOK WINAPI SetWindowsHookEx(
 takes a `HOOKPROC` parameter which is a user-defined callback subroutine that is executed when the specific hook event is trigged. In this case, the event is `WH_GETMESSAGE` which deals with messages in the message queue. The code initially loads the DLL into its own virtual process space and the exported `Demo` function's address is obtained and defined as the callback function in the call to `SetWindowsHookEx`. To force the callback function to execute, `PostThreadMessage` is called with the message `WM_RBUTTONDOWN` which will trigger the `WH_GETMESSAGE` hook and thus the message box will be displayed.
 
 #### QueueUserAPC
+
+DLL injection with [QueueUserAPC](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684954(v=vs.85).aspx) works similarly to that of `CreateRemoteThread`. Both allocate and inject the DLL path into the virtual address space of a target process and then force a call to `LoadLibrary` under its context.
+
+```c++
+int main() {
+    HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, false, dwProcessId);
+
+    HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, false, dwThreadId);
+    
+    LPVOID lpLoadLibraryParam = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT, PAGE_READWRITE);
+    
+    ::WriteProcessMemory(hProcess, lpLoadLibraryParam, dllPath.data(), dllPath.length(), &dwWritten);
+    
+    ::QueueUserAPC((PAPCFUNC)::GetProcAddress(::GetModuleHandleA("kernel32.dll"), "LoadLibraryA"), hThread, (ULONG_PTR)lpLoadLibraryParam);
+    
+    return 0;
+}
+```
+
+One major difference between this and `CreateRemoteThread` is that `QueueUserAPC` operates on _alertable states_. Asynchronous procedures queued by `QueueUserAPC` are only handled when a thread enters this state.
+
+### Process Hollowing
 
 ...
 
