@@ -353,17 +353,21 @@ Virtual Address Space of Target Process
 Windows offers developers the ability to monitor certain events with the installation of _hooks_ by using the [SetWindowsHookEx](https://msdn.microsoft.com/en-us/library/windows/desktop/ms644990(v=vs.85).aspx) function. While this function is very common in the monitoring of keystrokes for keylogger functionality, it can also be used to inject DLLs. The following code demonstrates DLL injection into itself:
 
 ```c++
+int main() {
     HMODULE hMod = ::LoadLibrary(DLL_PATH);
-	HOOKPROC lpfn = (HOOKPROC)::GetProcAddress(hMod, "Demo");
-	HHOOK hHook = ::SetWindowsHookEx(WH_GETMESSAGE, lpfn, hMod, ::GetCurrentThreadId());
-	::PostThreadMessageW(::GetCurrentThreadId(), WM_RBUTTONDOWN, (WPARAM)0, (LPARAM)0);
+    HOOKPROC lpfn = (HOOKPROC)::GetProcAddress(hMod, "Demo");
+    HHOOK hHook = ::SetWindowsHookEx(WH_GETMESSAGE, lpfn, hMod, ::GetCurrentThreadId());
+    ::PostThreadMessageW(::GetCurrentThreadId(), WM_RBUTTONDOWN, (WPARAM)0, (LPARAM)0);
 
     // message queue to capture events
-	MSG msg;
-	while (::GetMessage(&msg, nullptr, 0, 0) > 0) {
-		::TranslateMessage(&msg);
-		::DispatchMessage(&msg);
-	}
+    MSG msg;
+    while (::GetMessage(&msg, nullptr, 0, 0) > 0) {
+        ::TranslateMessage(&msg);
+        ::DispatchMessage(&msg);
+    }
+    
+    return 0;
+}
 ```
 
 `SetWindowsHookEx` defined by MSDN as:
