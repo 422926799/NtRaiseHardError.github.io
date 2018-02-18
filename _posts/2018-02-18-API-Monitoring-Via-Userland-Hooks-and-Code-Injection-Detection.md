@@ -225,7 +225,7 @@ void injectDll(const HANDLE hProcess, const std::string dllPath) {
   
     HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
   
-    LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");
+    LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");      // LoadLibraryA for ASCII string
   
     ::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
 }
@@ -240,6 +240,8 @@ HMODULE WINAPI LoadLibrary(
 ```
 
 It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL.
+
+#### SetWindowsHookEx
 
 
 
