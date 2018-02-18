@@ -186,6 +186,10 @@ Once the hook has been placed into `MessageBoxTimeoutW`, `MessageBoxA` and `Mess
 
 ## Code Injection Primer
 
+For the purposes of this paper, code injection will be defined as the insertion of executable code into an external process. The possibility of injecting code is a natural result of the functionality allowed by the WinAPI. If certain functions are stringed together, it is possible to access an existing process, write data to it and then execute it remotely under its context. In this section, the relevant techniques of code injection that was covered in the research will be introduced.
+
+### Process Hollowing
+
 
 
 ----
