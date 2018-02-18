@@ -319,7 +319,7 @@ Virtual Address Space of Target Process
 
 Since all system DLLs are mapped to the same address space across all processes, the address of `LoadLibrary` does not have to be directly retrieved from the target process. Simply calling `GetModuleHandle(TEXT("kernel32.dll"))` and `GetProcAddress(hModule, "LoadLibraryA")` will do the job.
 
-4. Force loading the DLL
+4. Loading the DLL
 
 The address of `LoadLibrary` and the path to the DLL are the two main elements required to load the DLL. Using the `CreateRemoteThread` function, `LoadLibrary` is executed under the context of the target process with the DLL path as a parameter.
 
@@ -333,7 +333,7 @@ Virtual Address Space of Target Process
                                    |          |                    |
                                    |          +--------------------+ <---+
                                    |          |     myDll.dll      |     |
-                                   |           +--------------------+     |
+                                   |          +--------------------+     |
                                    |          |                    |     | LoadLibrary
                                    |          +--------------------+     | loads
                                    |          |     Executable     |     | and
@@ -379,7 +379,7 @@ HHOOK WINAPI SetWindowsHookEx(
 
 takes a `HOOKPROC` parameter which is a user-defined callback subroutine that is executed when the specific hook event is trigged. In this case, the event is `WH_GETMESSAGE` which deals with messages in the message queue. The code initially loads the DLL into its own virtual process space and the exported `Demo` function's address is obtained and defined as the callback function in the call to `SetWindowsHookEx`. To force the callback function to execute, `PostThreadMessage` is called with the message `WM_RBUTTONDOWN` which will trigger the `WH_GETMESSAGE` hook and thus the message box will be displayed.
 
-#### QueueUserApc
+#### QueueUserAPC
 
 ...
 
