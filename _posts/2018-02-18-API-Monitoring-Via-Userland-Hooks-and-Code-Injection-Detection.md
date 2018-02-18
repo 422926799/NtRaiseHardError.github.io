@@ -188,9 +188,13 @@ Once the hook has been placed into `MessageBoxTimeoutW`, `MessageBoxA` and `Mess
 
 For the purposes of this paper, code injection will be defined as the insertion of executable code into an external process. The possibility of injecting code is a natural result of the functionality allowed by the WinAPI. If certain functions are stringed together, it is possible to access an existing process, write data to it and then execute it remotely under its context. In this section, the relevant techniques of code injection that was covered in the research will be introduced.
 
-### Process Hollowing
+### DLL Injection
 
+Code can come from a variety of forms, one of which is in the form of a _Dynamic Link Library_ (DLL). DLLs are libraries that are designed to offer extended functionality to an executable program which is made available by exporting subroutines. Here is an example DLL:
 
+```c++
+
+```
 
 ----
 
