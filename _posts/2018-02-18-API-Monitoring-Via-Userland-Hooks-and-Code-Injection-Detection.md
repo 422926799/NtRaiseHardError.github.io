@@ -60,10 +60,10 @@ To hook the function, we first require the intermediate function which **must** 
 
 ```c
 int WINAPI MessageBox(
-  _In_opt_ HWND    hWnd,
-  _In_opt_ LPCTSTR lpText,
-  _In_opt_ LPCTSTR lpCaption,
-  _In_     UINT    uType
+    _In_opt_ HWND    hWnd,
+    _In_opt_ LPCTSTR lpText,
+    _In_opt_ LPCTSTR lpCaption,
+    _In_     UINT    uType
 );
 ```
 
@@ -212,7 +212,36 @@ bool APIENTRY DllMain(HINSTANCE hInstDll, DWORD fdwReason, LPVOID lpvReserved) {
 
 When a DLL is loaded into a process and initialised, the loader will call `DllMain` with `fdwReason` set to `DLL_PROCESS_ATTACH`. For this example, when it is loaded into a process, it will thread the `Demo` subroutine to display a message box with the title `Demo` and the text `This is a demo!`. To correctly finish the initialisation of a DLL, it must return `true` or it will be unloaded.
 
+#### CreateRemoteThread
 
+DLL injection via the [CreateRemoteThread](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437(v=vs.85).aspx) function utilises this function to execute a remote thread in the virtual space of another process. As mentioned above, all that is required to execute a DLL is to have it load into the process by forcing it to execute the `LoadLibrary` function. The following code can be used to accomplish this:
+
+```c++
+void injectDll(const HANDLE hProcess, const std::string dllPath) {
+	LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	
+    DWORD dwWritten = 0;
+	::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
+  
+	HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
+  
+	LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");
+  
+    ::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
+}
+```
+
+MSDN defines [LoadLibrary](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684175(v=vs.85).aspx) as:
+
+```c
+HMODULE WINAPI LoadLibrary(
+    _In_ LPCTSTR lpFileName
+);
+```
+
+It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL.
+
+Using the `VirtualAllocEx` function, space can be allocated in the target process with a given size and memory protection attributes. It will return the starting address of the allocated space.
 
 ----
 
