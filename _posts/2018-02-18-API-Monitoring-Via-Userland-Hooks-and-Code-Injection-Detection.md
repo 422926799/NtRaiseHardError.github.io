@@ -135,9 +135,15 @@ int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT u
 
 The concept of API monitoring follows on from function hooking. Because gaining control of function calls is possible, observation of all of the parameters is also possible, as previously mentioned hence the name _API monitoring_. However, there is a small issue which is caused by the availability of different high-level API calls that are unique but operate using the same set of API at a lower level. This is called _function wrapping_, defined as _subroutines whose purpose is to call a secondary subroutine_. Returning to the `MessageBox` example, there are two defined functions: `MessageBoxA` for parameters that contain ASCII characters and a `MessageBoxW` for parameters that contain wide characters. In reality, to hook `MessageBox`, it is required that both `MessageBoxA` **and** `MessageBoxW` be patched. The solution to this problem is to hook at the **lowest** possible **common** point of the function call hierarchy. Here is what the `MessageBox` call hierarchy looks like:
 
+Here is `MessageBoxA`:
+
 ```
 user32!MessageBoxA -> user32!MessageBoxExA -> user32!MessageBoxTimeoutA -> user32!MessageBoxTimeoutW
+```
 
+and `MessageBoxW`:
+
+```
 user32!MessageBoxW -> user32!MessageBoxExW -> user32!MessageBoxTimeoutW
 ```
 
@@ -145,12 +151,12 @@ The call hierarchy both funnel into `MessageBoxTimeoutW` which is an appropriate
 
 ```
 int WINAPI MessageBoxTimeoutW(
-  HWND hWnd, 
-  LPCWSTR lpText, 
-  LPCWSTR lpCaption, 
-  UINT uType, 
-  WORD wLanguageId, 
-  DWORD dwMilliseconds
+    HWND hWnd, 
+    LPCWSTR lpText, 
+    LPCWSTR lpCaption, 
+    UINT uType, 
+    WORD wLanguageId, 
+    DWORD dwMilliseconds
 );
 ```
 
@@ -190,11 +196,21 @@ For the purposes of this paper, code injection will be defined as the insertion 
 
 ### DLL Injection
 
-Code can come from a variety of forms, one of which is in the form of a _Dynamic Link Library_ (DLL). DLLs are libraries that are designed to offer extended functionality to an executable program which is made available by exporting subroutines. Here is an example DLL:
+Code can come from a variety of forms, one of which is a _Dynamic Link Library_ (DLL). DLLs are libraries that are designed to offer extended functionality to an executable program which is made available by exporting subroutines. Here is an example DLL that will be used for the remainder of the paper:
 
 ```c++
+extern "C" void __declspec(dllexport) Demo() {
+    ::MessageBox(nullptr, TEXT("This is a demo!"), TEXT("Demo"), MB_OK);
+}
 
+int APIENTRY DllMain(HINSTANCE hInstDll, DWORD fdwReason, LPVOID lpvReserved) {
+    if (fdwReason == DLL_PROCESS_ATTACH)
+      ::CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)Demo, nullptr, 0, nullptr);
+    return true;
+}
 ```
+
+
 
 ----
 
