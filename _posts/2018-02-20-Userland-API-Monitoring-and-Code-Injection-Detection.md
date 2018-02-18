@@ -1,9 +1,9 @@
 ---
 layout: post
-title: API Monitoring via Userland Hooks and Code Injection Detection
+title: Userland API Monitoring and Code Injection Detection
 ---
 
-# API Monitoring via Userland Hooks and Code Injection Detection
+# Userland API Monitoring and Code Injection Detection
 
 ## About This Paper
 
