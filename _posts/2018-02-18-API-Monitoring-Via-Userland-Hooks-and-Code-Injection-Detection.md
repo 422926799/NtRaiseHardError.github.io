@@ -144,7 +144,7 @@ user32!MessageBoxW -> user32!MessageBoxExW -> user32!MessageBoxTimeoutW
 The call hierarchy both funnel into `MessageBoxTimeoutW` which is an appropriate location to hook. For functions that have a deeper hierarchy, hooking any lower could prove to be unecessarily troublesome due to the possibility of an increasing complexity of the function's parameters. `MessageBoxTimeoutW` is an undocumented WinAPI function and is defined<sup>[2]</sup> like so:
 
 ```
-int MessageBoxTimeoutW(
+int WINAPI MessageBoxTimeoutW(
   HWND hWnd, 
   LPCWSTR lpText, 
   LPCWSTR lpCaption, 
@@ -153,6 +153,29 @@ int MessageBoxTimeoutW(
   DWORD dwMilliseconds
 );
 ```
+
+To log the usage:
+
+```c++
+int WINAPI MessageBoxTimeoutW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType, WORD wLanguageId, DWORD dwMilliseconds) {
+    std::wofstream logfile;     // declare wide stream because of wide parameters
+    logfile.open(L"log.txt", std::ios::out | std::ios::app);
+    
+    logfile << L"Caption: " << lpCaption << L"\n";
+    logfile << L"Text: " << lpText << L"\n";
+    logfile << L"Type: " << uType << :"\n";
+    
+    logfile.close();
+}
+```
+
+Once the hook has been placed into `MessageBoxTimeoutW`, `MessageBoxA` and `MessageBoxW` should both be captured.
+
+----
+
+## Code Injection Primer
+
+
 
 ----
 
