@@ -133,7 +133,31 @@ int WINAPI HookedMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT u
 
 ## API Monitoring
 
-The concept of API monitoring follows on from function hooking. Because gaining control of function calls is possible, observation of all of the parameters is also possible, as previously mentioned hence the name _API monitoring_. However, there is a small issue which is caused by the availability of different high-level API calls that are unique but operate using the same set of API at a lower level. This is called _function wrapping_, defined as _subroutines whose purpose is to call a secondary subroutine_. Returning to the `MessageBox` example, there are two defined functions: `MessageBoxA` for parameters that contain ASCII characters and a `MessageBoxW` for parameters that contain wide characters. In reality, to hook `MessageBox`, it is required that both `MessageBoxA` **and** `MessageBoxW` be patched. The solution to this problem is to hook at the **lowest** possible **common** point of the function call hierarchy. Here is what the `MessageBox` call hierarchy looks like:
+The concept of API monitoring follows on from function hooking. Because gaining control of function calls is possible, observation of all of the parameters is also possible, as previously mentioned hence the name _API monitoring_. However, there is a small issue which is caused by the availability of different high-level API calls that are unique but operate using the same set of API at a lower level. This is called _function wrapping_, defined as _subroutines whose purpose is to call a secondary subroutine_. Returning to the `MessageBox` example, there are two defined functions: `MessageBoxA` for parameters that contain ASCII characters and a `MessageBoxW` for parameters that contain wide characters. In reality, to hook `MessageBox`, it is required that both `MessageBoxA` **and** `MessageBoxW` be patched. The solution to this problem is to hook at the **lowest** possible **common** point of the function call hierarchy. 
+
+```
+                                                      +---------+
+                                                      | Program |
+                                                      +---------+
+                                                     /           \
+                                                    |             |
+                                            +------------+   +------------+
+                                            | Function A |   | Function B |
+                                            +------------+   +------------+
+                                                    |             |
+                                            +-----------------------------+
+                                            |         Windows API         |
+                                            +-----------------------------+
+       +---------+       +-------- hook -----------------> |
+       |   API   | <---- +               +-------------------------------------+
+       | Monitor | <-----+               |                ntdll                |
+       +---------+       |               +-------------------------------------+
+                         +-------- hook -----------------> |                           User mode
+                                 -----------------------------------------------------
+                                                                                       Kernel mode
+```
+
+Here is what the `MessageBox` call hierarchy looks like:
 
 Here is `MessageBoxA`:
 
