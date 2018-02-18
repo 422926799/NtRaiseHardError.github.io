@@ -166,6 +166,17 @@ int WINAPI MessageBoxTimeoutW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT
     logfile << L"Type: " << uType << :"\n";
     
     logfile.close();
+    
+    // restore the original bytes
+    // ...
+    
+    // pass execution to the normal function and save the return value
+    int ret = MessageBoxTimeoutW(hWnd, lpText, lpCaption, uType, wLanguageId, dwMilliseconds);
+    
+    // rehook the function for next calls
+    // ...
+    
+    return ret;   // return the value of the original function
 }
 ```
 
