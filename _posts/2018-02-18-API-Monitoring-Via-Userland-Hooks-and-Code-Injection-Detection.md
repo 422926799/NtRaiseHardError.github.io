@@ -218,16 +218,16 @@ DLL injection via the [CreateRemoteThread](https://msdn.microsoft.com/en-us/libr
 
 ```c++
 void injectDll(const HANDLE hProcess, const std::string dllPath) {
-LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	
-	DWORD dwWritten = 0;
-	::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
+    DWORD dwWritten = 0;
+    ::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
   
-	HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
+    HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
   
-	LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");
+    LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");
   
-	::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
+    ::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
 }
 ```
 
