@@ -239,11 +239,42 @@ HMODULE WINAPI LoadLibrary(
 );
 ```
 
-It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL.
+It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL. When the DLL is loaded, 
 
 #### SetWindowsHookEx
 
+Windows offers developers the ability to monitor certain events with the installation of _hooks_ by using the [SetWindowsHookEx](https://msdn.microsoft.com/en-us/library/windows/desktop/ms644990(v=vs.85).aspx) function. While this function is very common in the monitoring of keystrokes for keylogger functionality, it can also be used to inject DLLs. The following code demonstrates DLL injection into itself:
 
+```c++
+    HMODULE hMod = ::LoadLibrary(DLL_PATH);
+	HOOKPROC lpfn = (HOOKPROC)::GetProcAddress(hMod, "Demo");
+	HHOOK hHook = ::SetWindowsHookEx(WH_GETMESSAGE, lpfn, hMod, ::GetCurrentThreadId());
+	::PostThreadMessageW(::GetCurrentThreadId(), WM_RBUTTONDOWN, (WPARAM)0, (LPARAM)0);
+
+    // message queue to capture events
+	MSG msg;
+	while (::GetMessage(&msg, nullptr, 0, 0) > 0) {
+		::TranslateMessage(&msg);
+		::DispatchMessage(&msg);
+	}
+```
+
+`SetWindowsHookEx` defined by MSDN as:
+
+```c
+HHOOK WINAPI SetWindowsHookEx(
+    _In_ int       idHook,
+    _In_ HOOKPROC  lpfn,
+    _In_ HINSTANCE hMod,
+    _In_ DWORD     dwThreadId
+);
+```
+
+takes a `HOOKPROC` parameter which is a user-defined callback subroutine that is executed when the specific hook event is trigged. In this case, the event is `WH_GETMESSAGE` which deals with messages in the message queue. The code initially loads the DLL into its own virtual process space and the exported `Demo` function's address is obtained and defined as the callback function in the call to `SetWindowsHookEx`. To force the callback function to execute, `PostThreadMessage` is called with the message `WM_RBUTTONDOWN` which will trigger the `WH_GETMESSAGE` hook and thus the message box will be displayed.
+
+#### QueueUserApc
+
+...
 
 ----
 
