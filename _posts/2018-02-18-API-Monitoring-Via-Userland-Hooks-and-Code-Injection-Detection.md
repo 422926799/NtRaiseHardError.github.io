@@ -263,7 +263,58 @@ HMODULE WINAPI LoadLibrary(
 );
 ```
 
-It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL. When the DLL is loaded, 
+It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL.
+
+1. Allocating virtual memory in the target process
+
+Using `VirtualAllocEx` allows space to be allocated within a selected process and on success, it will return the starting address of the allocated memory.
+
+```
+Virtual Address Space of Target Process
+                                              +--------------------+
+					      |                    |
+			VirtualAllocEx        +--------------------+
+			Allocated memory ---> |     Empty space    |
+					      +--------------------+
+					      |                    |
+					      +--------------------+
+					      |     Executable     |
+					      |      Process       |
+					      +--------------------+
+					      |                    |
+					      |                    |
+					      +--------------------+
+					      |    kernel32.dll    |
+					      +--------------------+
+					      |                    |
+					      +--------------------+
+```
+
+2. Writing the DLL path to allocated memory
+
+Once memory has been initialised, the path to the DLL can be injected into the allocated memory returned by `VirtualAllocEx` using `WriteProcessMemory`.
+```
+Virtual Address Space of Target Process
+                                              +--------------------+
+					      |                    |
+			WriteProcessMemory    +--------------------+
+			Inject DLL path ----> | "..\..\myDll.dll"  |
+					      +--------------------+
+					      |                    |
+					      +--------------------+
+					      |     Executable     |
+					      |      Process       |
+					      +--------------------+
+					      |                    |
+					      |                    |
+					      +--------------------+
+					      |    kernel32.dll    |
+					      +--------------------+
+					      |                    |
+					      +--------------------+
+```
+
+3. 
 
 #### SetWindowsHookEx
 
