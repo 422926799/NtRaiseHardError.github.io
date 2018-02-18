@@ -328,20 +328,20 @@ Virtual Address Space of Target Process
                                               +--------------------+
                                               |                    |
                                               +--------------------+
-                                              | "..\..\myDll.dll"  |
-                                              +--------------------+
-                                              |                    |
-                                              +--------------------+ <---+
-                                              |     myDll.dll      |     |
-                                              +--------------------+     |
-                                              |                    |     | LoadLibrary
-                                              +--------------------+     | loads
-                                              |     Executable     |     | and
-                                              |       Image        |     | initialises
-                                              +--------------------+     | myDll.dll
-                                              |                    |     |
-                                              |                    |     |
-          CreateRemoteThread                  +--------------------+     |
+                                   +--------- | "..\..\myDll.dll"  |
+                                   |          +--------------------+
+                                   |          |                    |
+                                   |          +--------------------+ <---+
+                                   |          |     myDll.dll      |     |
+                                   |           +--------------------+     |
+                                   |          |                    |     | LoadLibrary
+                                   |          +--------------------+     | loads
+                                   |          |     Executable     |     | and
+                                   |          |       Image        |     | initialises
+                                   |          +--------------------+     | myDll.dll
+                                   |          |                    |     |
+                                   |          |                    |     |
+          CreateRemoteThread       v          +--------------------+     |
           LoadLibraryA("..\..\myDll.dll") --> |    kernel32.dll    | ----+
                                               +--------------------+
                                               |                    |
