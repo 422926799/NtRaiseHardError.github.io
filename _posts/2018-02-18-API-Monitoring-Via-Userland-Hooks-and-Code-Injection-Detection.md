@@ -272,7 +272,7 @@ Using `VirtualAllocEx` allows space to be allocated within a selected process an
 ```
 Virtual Address Space of Target Process
                                               +--------------------+
-					                          |                    |
+                                              |                    |
                         VirtualAllocEx        +--------------------+
                         Allocated memory ---> |     Empty space    |
                                               +--------------------+
@@ -293,6 +293,7 @@ Virtual Address Space of Target Process
 2. Writing the DLL path to allocated memory
 
 Once memory has been initialised, the path to the DLL can be injected into the allocated memory returned by `VirtualAllocEx` using `WriteProcessMemory`.
+
 ```
 Virtual Address Space of Target Process
                                               +--------------------+
@@ -314,7 +315,38 @@ Virtual Address Space of Target Process
                                               +--------------------+
 ```
 
-3. 
+3. Get address of `LoadLibrary`
+
+Since all system DLLs are mapped to the same address space across all processes, the address of `LoadLibrary` does not have to be directly retrieved from the target process. Simply calling `GetModuleHandle(TEXT("kernel32.dll"))` and `GetProcAddress(hModule, "LoadLibraryA")` will do the job.
+
+4. Force loading the DLL
+
+The address of `LoadLibrary` and the path to the DLL are the two main elements required to load the DLL. Using the `CreateRemoteThread` function, `LoadLibrary` is executed under the context of the target process with the DLL path as a parameter.
+
+```
+Virtual Address Space of Target Process
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+                                              | "..\..\myDll.dll"  |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+ <---+
+                                              |     myDll.dll      |     |
+                                              +--------------------+     |
+                                              |                    |     | LoadLibrary
+                                              +--------------------+     | loads
+                                              |     Executable     |     | and
+                                              |       Image        |     | initialises
+                                              +--------------------+     | myDll.dll
+                                              |                    |     |
+                                              |                    |     |
+          CreateRemoteThread                  +--------------------+     |
+          LoadLibraryA("..\..\myDll.dll") --> |    kernel32.dll    | ----+
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+```
 
 #### SetWindowsHookEx
 
