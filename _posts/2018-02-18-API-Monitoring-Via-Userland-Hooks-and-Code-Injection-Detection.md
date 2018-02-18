@@ -272,22 +272,22 @@ Using `VirtualAllocEx` allows space to be allocated within a selected process an
 ```
 Virtual Address Space of Target Process
                                               +--------------------+
-					      |                    |
-			VirtualAllocEx        +--------------------+
-			Allocated memory ---> |     Empty space    |
-					      +--------------------+
-					      |                    |
-					      +--------------------+
-					      |     Executable     |
-					      |      Process       |
-					      +--------------------+
-					      |                    |
-					      |                    |
-					      +--------------------+
-					      |    kernel32.dll    |
-					      +--------------------+
-					      |                    |
-					      +--------------------+
+					                          |                    |
+                        VirtualAllocEx        +--------------------+
+                        Allocated memory ---> |     Empty space    |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+                                              |     Executable     |
+                                              |       Image        |
+                                              +--------------------+
+                                              |                    |
+                                              |                    |
+                                              +--------------------+
+                                              |    kernel32.dll    |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
 ```
 
 2. Writing the DLL path to allocated memory
@@ -296,22 +296,22 @@ Once memory has been initialised, the path to the DLL can be injected into the a
 ```
 Virtual Address Space of Target Process
                                               +--------------------+
-					      |                    |
-			WriteProcessMemory    +--------------------+
-			Inject DLL path ----> | "..\..\myDll.dll"  |
-					      +--------------------+
-					      |                    |
-					      +--------------------+
-					      |     Executable     |
-					      |      Process       |
-					      +--------------------+
-					      |                    |
-					      |                    |
-					      +--------------------+
-					      |    kernel32.dll    |
-					      +--------------------+
-					      |                    |
-					      +--------------------+
+                                              |                    |
+                        WriteProcessMemory    +--------------------+
+                        Inject DLL path ----> | "..\..\myDll.dll"  |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+                                              |     Executable     |
+                                              |       Image        |
+                                              +--------------------+
+                                              |                    |
+                                              |                    |
+                                              +--------------------+
+                                              |    kernel32.dll    |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
 ```
 
 3. 
