@@ -220,14 +220,14 @@ DLL injection via the [CreateRemoteThread](https://msdn.microsoft.com/en-us/libr
 void injectDll(const HANDLE hProcess, const std::string dllPath) {
 	LPVOID lpBaseAddress = ::VirtualAllocEx(hProcess, nullptr, dllPath.length(), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	
-    DWORD dwWritten = 0;
+	DWORD dwWritten = 0;
 	::WriteProcessMemory(hProcess, lpBaseAddress, dllPath.c_str(), dllPath.length(), &dwWritten);
   
 	HMODULE hModule = ::GetModuleHandle(L"kernel32.dll");
   
 	LPVOID lpStartAddress = ::GetProcAddress(hModule, "LoadLibraryA");
   
-    ::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
+	::CreateRemoteThread(hProcess, nullptr, 0, (LPTHREAD_START_ROUTINE)lpStartAddress, lpBaseAddress, 0, nullptr);
 }
 ```
 
@@ -241,7 +241,7 @@ HMODULE WINAPI LoadLibrary(
 
 It takes a single parameter which is the path name to the desired library to load. The `CreateRemoteThread` function allows one parameter to be passed into the thread routine which matches exactly that of `LoadLibrary`'s function definition. The goal is to allocate the string parameter in the virtual address space of the target process and then pass that allocated space's address into the parameter argument of `CreateRemoteThread` so that `LoadLibrary` can be invoked to load the DLL.
 
-Using the `VirtualAllocEx` function, space can be allocated in the target process with a given size and memory protection attributes. It will return the starting address of the allocated space.
+
 
 ----
 
