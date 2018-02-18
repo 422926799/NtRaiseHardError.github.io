@@ -384,7 +384,7 @@ takes a `HOOKPROC` parameter which is a user-defined callback subroutine that is
 
 #### QueueUserAPC
 
-DLL injection with [QueueUserAPC](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684954(v=vs.85).aspx) works similarly to that of `CreateRemoteThread`. Both allocate and inject the DLL path into the virtual address space of a target process and then force a call to `LoadLibrary` under its context.
+DLL injection with [QueueUserAPC](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684954(v=vs.85).aspx) works similar to that of `CreateRemoteThread`. Both allocate and inject the DLL path into the virtual address space of a target process and then force a call to `LoadLibrary` under its context.
 
 ```c++
 int main() {
