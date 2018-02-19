@@ -387,7 +387,7 @@ takes a `HOOKPROC` parameter which is a user-defined callback subroutine that is
 DLL injection with [QueueUserAPC](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684954(v=vs.85).aspx) works similar to that of `CreateRemoteThread`. Both allocate and inject the DLL path into the virtual address space of a target process and then force a call to `LoadLibrary` under its context.
 
 ```c++
-int main() {
+int injectDll(const std::string dllPath, const DWORD dwProcessId, const DWORD dwThreadId) {
     HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, false, dwProcessId);
 
     HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, false, dwThreadId);
@@ -406,7 +406,30 @@ One major difference between this and `CreateRemoteThread` is that `QueueUserAPC
 
 ### Process Hollowing
 
-Process hollowing, AKA RunPE, is a popular method used to bypass anti-virus detection. It allows executable files to be loaded into a target process and executed under its context.
+Process hollowing, AKA RunPE, is a popular method used to evade anti-virus detection. It allows the injection of entire executable files to be loaded into a target process and executed under its context. Often seen in crypted applications, a file on disk that is compatible with the payload is selected as the host and is created as a process, has its main executable module _hollowed_ out and replaced. This procedure can be broken up into three stages.
+
+1. Creating a host process
+
+In order for the payload to be injected, the bootstrap application must first locate a suitable host. If the payload is a .NET application, the host must also be a .NET application. If the payload is a native executable defined to use the console subsystem, the host must also reflect the same attributes. The same is applied to x86 and x64 programs. Once the host has been chosen, it is created as a suspended process using `CreateProcess(PATH_TO_HOST_EXE, ..., CREATE_SUSPENDED, ...)`.
+
+
+```
+Executable Image of Host Process
+                                              +--------------------+
+                                              |         PE         |
+                                              |       Headers      |
+                                              +--------------------+
+                                              |       .text        |
+                                              +--------------------+
+                                              |       .data        |
+                                              +--------------------+
+                                              |         ...        |
+                                              +--------------------+
+                                              |         ...        |
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+```
 
 ----
 
