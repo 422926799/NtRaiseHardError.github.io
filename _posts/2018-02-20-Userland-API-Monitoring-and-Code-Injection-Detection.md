@@ -586,9 +586,11 @@ typedef struct _CONTEXT
 } CONTEXT, *PCONTEXT;
 ```
 
-To modify the starting address, the `Eax` member must be changed (for Win32 applications) to the _virtual address_ of the payload's `AddressOfEntryPoint`. Simply, `context.Eax = ImageBase + AddressOfEntryPoint`. To apply the changes to the process's thread, calling `SetThreadContext` by passing in the modified `CONTEXT` struct is sufficient. All that is required now is to call `ResumeThread` and payload should start execution.
+To modify the starting address, the `Eax` member must be changed to the _virtual address_ of the payload's `AddressOfEntryPoint`. Simply, `context.Eax = ImageBase + AddressOfEntryPoint`. To apply the changes to the process's thread, calling `SetThreadContext` and passing in the modified `CONTEXT` struct is sufficient. All that is required now is to call `ResumeThread` and payload should start execution.
 
 ### Atom Bombing
+
+The Atom Bombing is a code injection technique that takes advantage of global data storage via Windows Atoms.
 
 ----
 
