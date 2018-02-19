@@ -406,30 +406,56 @@ One major difference between this and `CreateRemoteThread` is that `QueueUserAPC
 
 ### Process Hollowing
 
-Process hollowing, AKA RunPE, is a popular method used to evade anti-virus detection. It allows the injection of entire executable files to be loaded into a target process and executed under its context. Often seen in crypted applications, a file on disk that is compatible with the payload is selected as the host and is created as a process, has its main executable module _hollowed_ out and replaced. This procedure can be broken up into three stages.
+Process hollowing, AKA RunPE, is a popular method used to evade anti-virus detection. It allows the injection of entire executable files to be loaded into a target process and executed under its context. Often seen in crypted applications, a file on disk that is compatible with the payload is selected as the host and is created as a process, has its main executable module _hollowed_ out and replaced. This procedure can be broken up into four stages.
 
 1. Creating a host process
 
-In order for the payload to be injected, the bootstrap application must first locate a suitable host. If the payload is a .NET application, the host must also be a .NET application. If the payload is a native executable defined to use the console subsystem, the host must also reflect the same attributes. The same is applied to x86 and x64 programs. Once the host has been chosen, it is created as a suspended process using `CreateProcess(PATH_TO_HOST_EXE, ..., CREATE_SUSPENDED, ...)`.
+In order for the payload to be injected, the bootstrap must first locate a suitable host. If the payload is a .NET application, the host must also be a .NET application. If the payload is a native executable defined to use the console subsystem, the host must also reflect the same attributes. The same is applied to x86 and x64 programs. Once the host has been chosen, it is created as a suspended process using `CreateProcess(PATH_TO_HOST_EXE, ..., CREATE_SUSPENDED, ...)`.
 
 
 ```
 Executable Image of Host Process
-                                              +--------------------+
-                                              |         PE         |
-                                              |       Headers      |
-                                              +--------------------+
-                                              |       .text        |
-                                              +--------------------+
-                                              |       .data        |
-                                              +--------------------+
-                                              |         ...        |
-                                              +--------------------+
-                                              |         ...        |
-                                              +--------------------+
-                                              |                    |
-                                              +--------------------+
+                                        +---  +--------------------+
+                                        |     |         PE         |
+                                        |     |       Headers      |
+                                        |     +--------------------+
+                                        |     |       .text        |
+                                        |     +--------------------+
+                          CreateProcess +     |       .data        |
+                                        |     +--------------------+
+                                        |     |         ...        |
+                                        |     +--------------------+
+                                        |     |         ...        |
+                                        |     +--------------------+
+                                        |     |                    |
+                                        +---  +--------------------+
 ```
+
+2. Hollowing the host process
+
+For the payload to work correctly after injection, it must be mapped to a virtual address space that matches its `ImageBase` value. This is important because it is more than likely that absolute addresses are involved within the code which is entirely dependent on its location in memory. To safely map the executable image, the virtual memory space starting at the described `ImageBase` value must be unmapped. Since many executables share common base addresses (usually `0x400000`), it is not common to see the host process's own executable image unmapped as a result. This is done with `NtUnmapViewOfSection(IMAGE_BASE, SIZE_OF_IMAGE)`.
+
+```
+Executable Image of Host Process
+                                        +---  +--------------------+
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                   NtUnmapViewOfSection +     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        |     |                    |
+                                        +---  +--------------------+
+```
+
+3. Injecting the payload
+
+
 
 ----
 
