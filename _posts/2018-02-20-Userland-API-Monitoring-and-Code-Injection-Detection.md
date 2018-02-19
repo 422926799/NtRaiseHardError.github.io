@@ -443,7 +443,7 @@ typedef struct _IMAGE_OPTIONAL_HEADER {
   DWORD                SizeOfCode;
   DWORD                SizeOfInitializedData;
   DWORD                SizeOfUninitializedData;
-  DWORD                AddressOfEntryPoint;
+  DWORD                AddressOfEntryPoint;          // <---- this is required later
   DWORD                BaseOfCode;
   DWORD                BaseOfData;
   DWORD                ImageBase;                    // <---- 
@@ -456,7 +456,7 @@ typedef struct _IMAGE_OPTIONAL_HEADER {
   WORD                 MajorSubsystemVersion;
   WORD                 MinorSubsystemVersion;
   DWORD                Win32VersionValue;
-  DWORD                SizeOfImage;                  // <----
+  DWORD                SizeOfImage;                  // <---- size of the PE file as an image
   DWORD                SizeOfHeaders;
   DWORD                CheckSum;
   WORD                 Subsystem;
@@ -513,7 +513,7 @@ Executable Image of Host Process
                                               +--------------------+
 ```
 
-To convert the PE file to an image, all of the sections must be read from their file offsets and then placed correctly into their correct virtual offsets. This is described in each of the sections' own [section header](https://msdn.microsoft.com/en-us/library/windows/desktop/ms680341(v=vs.85).aspx).
+To convert the PE file to an image, all of the sections must be individually read from their file offsets and then placed correctly into their correct virtual offsets using `WriteProcessMemory`. This is described in each of the sections' own [section header](https://msdn.microsoft.com/en-us/library/windows/desktop/ms680341(v=vs.85).aspx).
 
 ```c
 typedef struct _IMAGE_SECTION_HEADER {
@@ -553,7 +553,43 @@ Executable Image of Host Process
 
 4. Execution of payload
 
+The final step is to point the starting address of execution to the payload's aforementioned `AddressOfEntryPoint`. Since the process's main thread is suspended, using `GetThreadContext` to retrieve the relevant information. The context structure is defined as:
 
+```c
+typedef struct _CONTEXT
+{
+     ULONG ContextFlags;
+     ULONG Dr0;
+     ULONG Dr1;
+     ULONG Dr2;
+     ULONG Dr3;
+     ULONG Dr6;
+     ULONG Dr7;
+     FLOATING_SAVE_AREA FloatSave;
+     ULONG SegGs;
+     ULONG SegFs;
+     ULONG SegEs;
+     ULONG SegDs;
+     ULONG Edi;
+     ULONG Esi;
+     ULONG Ebx;
+     ULONG Edx;
+     ULONG Ecx;
+     ULONG Eax;
+     ULONG Ebp;
+     ULONG Eip;
+     ULONG SegCs;
+     ULONG EFlags;
+     ULONG Esp;
+     ULONG SegSs;
+     UCHAR ExtendedRegisters[512];
+} CONTEXT, *PCONTEXT;
+```
+
+To modify the starting address, the `Eax` member must be changed to the _virtual address_ of the payload's `AddressOfEntryPoint`. For Win32 applications, `context.Eax = ImageBase + AddressOfEntryPoint`. To apply the changes to the process's thread, calling `SetThreadContext` by passing in the modified `CONTEXT` struct is sufficient. All that is required now is to call `ResumeThread` and payload should start execution.
+
+
+### Atom Bombing
 
 ----
 
