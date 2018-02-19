@@ -427,13 +427,51 @@ Executable Image of Host Process
                                         |     +--------------------+
                                         |     |         ...        |
                                         |     +--------------------+
-                                        |     |                    |
+                                        |     |         ...        |
                                         +---  +--------------------+
 ```
 
 2. Hollowing the host process
 
-For the payload to work correctly after injection, it must be mapped to a virtual address space that matches its `ImageBase` value. This is important because it is more than likely that absolute addresses are involved within the code which is entirely dependent on its location in memory. To safely map the executable image, the virtual memory space starting at the described `ImageBase` value must be unmapped. Since many executables share common base addresses (usually `0x400000`), it is not common to see the host process's own executable image unmapped as a result. This is done with `NtUnmapViewOfSection(IMAGE_BASE, SIZE_OF_IMAGE)`.
+For the payload to work correctly after injection, it must be mapped to a virtual address space that matches its `ImageBase` value found in the [optional header](https://msdn.microsoft.com/en-us/library/windows/desktop/ms680339(v=vs.85).aspx) of the payload's PE headers. 
+
+```c
+typedef struct _IMAGE_OPTIONAL_HEADER {
+  WORD                 Magic;
+  BYTE                 MajorLinkerVersion;
+  BYTE                 MinorLinkerVersion;
+  DWORD                SizeOfCode;
+  DWORD                SizeOfInitializedData;
+  DWORD                SizeOfUninitializedData;
+  DWORD                AddressOfEntryPoint;
+  DWORD                BaseOfCode;
+  DWORD                BaseOfData;
+  DWORD                ImageBase;                    // <---- 
+  DWORD                SectionAlignment;
+  DWORD                FileAlignment;
+  WORD                 MajorOperatingSystemVersion;
+  WORD                 MinorOperatingSystemVersion;
+  WORD                 MajorImageVersion;
+  WORD                 MinorImageVersion;
+  WORD                 MajorSubsystemVersion;
+  WORD                 MinorSubsystemVersion;
+  DWORD                Win32VersionValue;
+  DWORD                SizeOfImage;                  // <----
+  DWORD                SizeOfHeaders;
+  DWORD                CheckSum;
+  WORD                 Subsystem;
+  WORD                 DllCharacteristics;
+  DWORD                SizeOfStackReserve;
+  DWORD                SizeOfStackCommit;
+  DWORD                SizeOfHeapReserve;
+  DWORD                SizeOfHeapCommit;
+  DWORD                LoaderFlags;
+  DWORD                NumberOfRvaAndSizes;
+  IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
+} IMAGE_OPTIONAL_HEADER, *PIMAGE_OPTIONAL_HEADER;
+```
+
+This is important because it is more than likely that absolute addresses are involved within the code which is entirely dependent on its location in memory. To safely map the executable image, the virtual memory space starting at the described `ImageBase` value must be unmapped. Since many executables share common base addresses (usually `0x400000`), it is not uncommon to see the host process's own executable image unmapped as a result. This is done with `NtUnmapViewOfSection(IMAGE_BASE, SIZE_OF_IMAGE)`.
 
 ```
 Executable Image of Host Process
@@ -454,6 +492,66 @@ Executable Image of Host Process
 ```
 
 3. Injecting the payload
+
+To inject the payload, the PE file must be parsed manually to transform it from its disk form to its image form. After allocating virtual memory with `VirtualAllocEx`, the PE headers are directly copied to that base address.
+
+```
+Executable Image of Host Process
+                                        +---  +--------------------+
+                                        |     |         PE         |
+                                        |     |       Headers      |
+                                        +---  +--------------------+
+                                        |     |                    |
+                                        |     |                    |
+                     WriteProcessMemory +     |                    |
+                                              |                    |
+                                              |                    |
+                                              |                    |
+                                              |                    |
+                                              |                    |
+                                              |                    |
+                                              +--------------------+
+```
+
+To convert the PE file to an image, all of the sections must be read from their file offsets and then placed correctly into their correct virtual offsets. This is described in each of the sections' own [section header](https://msdn.microsoft.com/en-us/library/windows/desktop/ms680341(v=vs.85).aspx).
+
+```c
+typedef struct _IMAGE_SECTION_HEADER {
+  BYTE  Name[IMAGE_SIZEOF_SHORT_NAME];
+  union {
+    DWORD PhysicalAddress;
+    DWORD VirtualSize;
+  } Misc;
+  DWORD VirtualAddress;               // <---- virtual offset
+  DWORD SizeOfRawData;
+  DWORD PointerToRawData;             // <---- file offset
+  DWORD PointerToRelocations;
+  DWORD PointerToLinenumbers;
+  WORD  NumberOfRelocations;
+  WORD  NumberOfLinenumbers;
+  DWORD Characteristics;
+} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
+```
+
+```
+Executable Image of Host Process
+                                              +--------------------+
+                                              |         PE         |
+                                              |       Headers      |
+                                        +---  +--------------------+
+                                        |     |       .text        |
+                                        +---  +--------------------+
+                     WriteProcessMemory +     |       .data        |
+                                        +---  +--------------------+
+                                        |     |         ...        |
+                                        +---- +--------------------+
+                                        |     |         ...        |
+                                        +---- +--------------------+
+                                        |     |         ...        |
+                                        +---- +--------------------+
+```
+
+4. Execution of payload
 
 
 
