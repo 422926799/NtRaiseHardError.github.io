@@ -27,6 +27,7 @@ The following document is a result of self-research of malicious software (malwa
     * [Code Injection Detection](#code-injection-detection)
     * [Code Injection Dumping](#code-injection-dumping)
     * [UnRunPE Demonstration](#unrunpe-demonstration)
+3. [Section III: Dreadnought](#section-iii-dreadnought)
     
 
 ## Introduction
@@ -715,6 +716,12 @@ Once the necessary functions are hooked, the target process is executed and each
 For the demonstration, I have chosen to use a trojanised binary that I had previously created as an experiment. It consists of the main executable `PEview.exe` and `PuTTY.exe` as the hidden executable.
 
 ![UnRunPE](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot%20from%202018-02-20%2018-35-29.png)
+
+----
+
+# Section III: Dreadnought
+
+...
 
 ----
 
