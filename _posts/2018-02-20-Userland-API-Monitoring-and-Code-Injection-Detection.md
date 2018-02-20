@@ -88,7 +88,7 @@ versus the hooked function:
 
 ```asm
 ; MessageBox
-68 xx xx xx xx  push <HookedMessageBox> ; our hooked function
+68 xx xx xx xx  push <HookedMessageBox> ; our intermediate function
 C3              ret
 ```
 
@@ -145,12 +145,12 @@ The concept of API monitoring follows on from function hooking. Because gaining 
                                             | Function A |   | Function B |
                                             +------------+   +------------+
                                                     |             |
-                                            +-----------------------------+
-                                            |         Windows API         |
-                                            +-----------------------------+
+                                           +-------------------------------+
+                                           | user32.dll, kernel32.dll, ... |
+                                           +-------------------------------+
        +---------+       +-------- hook -----------------> |
        |   API   | <---- +              +-------------------------------------+
-       | Monitor | <-----+              |                ntdll                |
+       | Monitor | <-----+              |              ntdll.dll              |
        +---------+       |              +-------------------------------------+
                          +-------- hook -----------------> |                           User mode
                                  -----------------------------------------------------
