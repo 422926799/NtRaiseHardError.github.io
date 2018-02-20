@@ -623,13 +623,13 @@ VOID CALLBACK APCProc(               UINT WINAPI GlobalGetAtomName(
 However, the underlying implementation of `NtQueueApcThread` allows for three potential parameters:
 
 ```c
-NTSTATUS NTAPI NtQueueApcThread(                          UINT WINAPI GlobalGetAtomName(
-    _In_     HANDLE               ThreadHandle,               // target process's thread
-    _In_     PIO_APC_ROUTINE      ApcRoutine,                 // APCProc (for GlobalGetAtomName)
-    _In_opt_ PVOID                ApcRoutineContext,  ->      _In_  ATOM   nAtom,
-    _In_opt_ PIO_STATUS_BLOCK     ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
-    _In_opt_ ULONG                ApcReserved                 _In_  int    nSize
-);                                                        );
+NTSTATUS NTAPI NtQueueApcThread(                      UINT WINAPI GlobalGetAtomName(
+    _In_     HANDLE           ThreadHandle,               // target process's thread
+    _In_     PIO_APC_ROUTINE  ApcRoutine,                 // APCProc (for GlobalGetAtomName)
+    _In_opt_ PVOID            ApcRoutineContext,  ->      _In_  ATOM   nAtom,
+    _In_opt_ PIO_STATUS_BLOCK ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
+    _In_opt_ ULONG            ApcReserved                 _In_  int    nSize
+);                                                    );
 ```
 
 Here is a visual representation of the code injection procedure:
