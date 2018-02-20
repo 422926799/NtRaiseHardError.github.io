@@ -662,7 +662,11 @@ This is a very simplified overview of atom bombing but should be adequate for th
 
 ## Section II: UnRunPE
 
-UnRunPE is a proof-of-concept (PoC) tool that was created for the purposes of applying API monitoring theory to practice. It aims to create a chosen executable file as a suspended process into which a DLL will be injected to hook specific functions utilised by a process hollowing technique. From the code injection primer, the process hollowing method was described with the following WinAPI call chain:
+UnRunPE is a proof-of-concept (PoC) tool that was created for the purposes of applying API monitoring theory to practice. It aims to create a chosen executable file as a suspended process into which a DLL will be injected to hook specific functions utilised by the process hollowing technique. 
+
+### Code Injection Detection
+
+From the code injection primer, the process hollowing method was described with the following WinAPI call chain:
 
 1. `CreateProcess`
 2. `NtUnmapViewOfSection`
@@ -672,17 +676,23 @@ UnRunPE is a proof-of-concept (PoC) tool that was created for the purposes of ap
 6. `SetThreadContext`
 7. `ResumeThread`
 
-A few of these calls do not have to be in this sepcific order, for example, `GetThreadContext` can be called before `VirtualAllocEx`. However, the general arrangement cannot deviate much because of the reliance on former API calls, for example, `SetThreadContext` _must_ be called before `GetThreadContext` or `CreateProcess` _must_ be called first otherwise there will be no target process to inject the payload. The tool assumes this as a basis on which it will operate in an attempt to detect a potentially active process hollowing.
+A few of these calls do not have to be in this specific order, for example, `GetThreadContext` can be called before `VirtualAllocEx`. However, the general arrangement cannot deviate much because of the reliance on former API calls, for example, `SetThreadContext` _must_ be called before `GetThreadContext` or `CreateProcess` _must_ be called first otherwise there will be no target process to inject the payload. The tool assumes this as a basis on which it will operate in an attempt to detect a potentially active process hollowing.
 
-Following the theory of API monitoring, it is best to hook the lowest, **common** point but when it comes it malware, the lowest point should _ideally_ be the **lowest** possible that is accessible. Assuming a worst case scenario, the author may attempt to skip the higher-level WinAPI functions and directly call the lowest function in the call hierarchy, usually found in the `ntdll.dll` module. The following WinAPI functions are the lowest in the call hierarchy for process hollowing:
+Following the theory of API monitoring, it is best to hook the lowest, **common** point but when it comes it malware, it should _ideally_ be the **lowest** possible that is accessible. Assuming a worst case scenario, the author may attempt to skip the higher-level WinAPI functions and directly call the lowest function in the call hierarchy, usually found in the `ntdll.dll` module. The following WinAPI functions are the lowest in the call hierarchy for process hollowing:
 
 1. `NtCreateUserProcess`
 2. `NtUnmapViewOfSection`
 3. `NtAllocateVirtualMemory`
-4. `NtWriteProcessMemory`
+4. `NtWriteVirtualMemory`
 5. `NtGetContextThread`
 6. `NtSetContextThread`
 7. `NtResumeThread`
+
+### Code Injection Dumping
+
+Once the necessary functions are hooked, the target process is executed and each of the hooked functions' parameters are logged to keep track of the current progress of the process hollowing and the host process. The most significant hooks are `NtWriteVirtualMemory` and `NtResumeThread` because the former applies the injection of the code and the latter executes it. Along with logging the parameters, UnRunPE will also attempt to dump the bytes written using `NtWriteVirtualMemory` and then when `NtResumeThread` is reached, it will attempt to dump the entire payload that has been injected into the host process. To achieve this, it uses the process and thread handle parameters logged in `NtCreateUserProcess` and the base address and size logged from `NtUnmapViewOfSection`. Using the parameters provided by `NtAllocateVirtualMemory` may be more appropriate however, due to some unknown reasons, hooking that function results in some runtime errors. When the payload has been dumped from `NtResumeThread`, it will terminate the target process and its host process to prevent execution of the injected code.
+
+
 
 ----
 
