@@ -679,11 +679,11 @@ This is a very simplified overview of atom bombing but should be adequate for th
 
 ----
 
-## Section II: UnRunPE
+# Section II: UnRunPE
 
 UnRunPE is a proof-of-concept (PoC) tool that was created for the purposes of applying API monitoring theory to practice. It aims to create a chosen executable file as a suspended process into which a DLL will be injected to hook specific functions utilised by the process hollowing technique. 
 
-### Code Injection Detection
+## Code Injection Detection
 
 From the code injection primer, the process hollowing method was described with the following WinAPI call chain:
 
@@ -707,11 +707,11 @@ Following the theory of API monitoring, it is best to hook the lowest, **common*
 6. `NtSetContextThread`
 7. `NtResumeThread`
 
-### Code Injection Dumping
+## Code Injection Dumping
 
 Once the necessary functions are hooked, the target process is executed and each of the hooked functions' parameters are logged to keep track of the current progress of the process hollowing and the host process. The most significant hooks are `NtWriteVirtualMemory` and `NtResumeThread` because the former applies the injection of the code and the latter executes it. Along with logging the parameters, UnRunPE will also attempt to dump the bytes written using `NtWriteVirtualMemory` and then when `NtResumeThread` is reached, it will attempt to dump the entire payload that has been injected into the host process. To achieve this, it uses the process and thread handle parameters logged in `NtCreateUserProcess` and the base address and size logged from `NtUnmapViewOfSection`. Using the parameters provided by `NtAllocateVirtualMemory` may be more appropriate however, due to some unknown reasons, hooking that function results in some runtime errors. When the payload has been dumped from `NtResumeThread`, it will terminate the target process and its host process to prevent execution of the injected code.
 
-### UnRunPE Demonstration
+## UnRunPE Demonstration
 
 For the demonstration, I have chosen to use a trojanised binary that I had previously created as an experiment. It consists of the main executable `PEview.exe` and `PuTTY.exe` as the hidden executable.
 
