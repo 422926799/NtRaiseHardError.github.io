@@ -594,7 +594,7 @@ The Atom Bombing is a code injection technique that takes advantage of global da
 
 ```c
 ATOM WINAPI GlobalAddAtom(
-  _In_ LPCTSTR lpString
+    _In_ LPCTSTR lpString
 );
 ```
 
@@ -602,35 +602,67 @@ where `lpString` is the data to be stored. The 16-bit integer atom is returned o
 
 ```c
 UINT WINAPI GlobalGetAtomName(
-  _In_  ATOM   nAtom,
-  _Out_ LPTSTR lpBuffer,
-  _In_  int    nSize
+    _In_  ATOM   nAtom,
+    _Out_ LPTSTR lpBuffer,
+    _In_  int    nSize
 );
 ```
 
 Passing in the identifying atom returned from `GlobalAddAtom` will place the data into `lpBuffer` and return the length of the string _excluding_ the null-terminator.
 
-Atom bombing works by forcing the target process to load and execute code placed within the global atom table and this relies on one other crucial function, `NtQueueApcThread`, which is lowest level userland call for `QueueUserAPC`. The reason why `NtQueueApcThread` is used over `QueueUserAPC` is because, as seen before, `QueueUserAPC`'s [APCProc](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681947(v=vs.85).aspx) only receives one parameter which is a parameter mismatch compared to `GlobalGetAtomName`.
+Atom bombing works by forcing the target process to load and execute code placed within the global atom table and this relies on one other crucial function, `NtQueueApcThread`, which is lowest level userland call for `QueueUserAPC`. The reason why `NtQueueApcThread` is used over `QueueUserAPC` is because, as seen before, `QueueUserAPC`'s [APCProc](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681947(v=vs.85).aspx) only receives one parameter which is a parameter mismatch compared to `GlobalGetAtomName`<sup>[3]</sup>.
 
 ```c
-VOID CALLBACK APCProc(             UINT WINAPI GlobalGetAtomName(
-                                       _In_  ATOM   nAtom,
-  _In_ ULONG_PTR dwParam     ->        _Out_ LPTSTR lpBuffer,
-                                       _In_  int    nSize
-);                                 );
+VOID CALLBACK APCProc(               UINT WINAPI GlobalGetAtomName(
+                                         _In_  ATOM   nAtom,
+    _In_ ULONG_PTR dwParam     ->        _Out_ LPTSTR lpBuffer,
+                                         _In_  int    nSize
+);                                   );
 ```
 
 However, the underlying implementation of `NtQueueApcThread` allows for three potential parameters:
 
 ```c
-NTSTATUS NTAPI NtQueueApcThread(                        UINT WINAPI GlobalGetAtomName(
-  _In_     HANDLE               ThreadHandle,           
-  _In_     PIO_APC_ROUTINE      ApcRoutine,                 // APCProc (for GlobalGetAtomName)
-  _In_opt_ PVOID                ApcRoutineContext,  ->      _In_  ATOM   nAtom,
-  _In_opt_ PIO_STATUS_BLOCK     ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
-  _In_opt_ ULONG                ApcReserved                 _In_  int    nSize
-);                                                      );
+NTSTATUS NTAPI NtQueueApcThread(                          UINT WINAPI GlobalGetAtomName(
+    _In_     HANDLE               ThreadHandle,               // target process's thread
+    _In_     PIO_APC_ROUTINE      ApcRoutine,                 // APCProc (for GlobalGetAtomName)
+    _In_opt_ PVOID                ApcRoutineContext,  ->      _In_  ATOM   nAtom,
+    _In_opt_ PIO_STATUS_BLOCK     ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
+    _In_opt_ ULONG                ApcReserved                 _In_  int    nSize
+);                                                        );
 ```
+
+Here is a visual representation of the code injection procedure:
+
+```
+Atom bombing code injection
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+                                              |      lpBuffer      | <-+
+                                              |                    |   |
+                                              +--------------------+   |
+     +---------+                              |                    |   | Calls
+     |  Atom   |                              +--------------------+   | GlobalGetAtomName
+     | Bombing |                              |     Executable     |   | specifying
+     | Process |                              |       Image        |   | arbitrary
+     +---------+                              +--------------------+   | address space
+          |                                   |                    |   | and loads shellcode
+          |                                   |                    |   |
+          |           NtQueueApcThread        +--------------------+   |
+          +---------- GlobalGetAtomName ----> |      ntdll.dll     | --+
+                                              +--------------------+
+                                              |                    |
+                                              +--------------------+
+```
+
+This is a very simplified overview of atom bombing but should be adequate for the remainder of the paper. For more information on atom bombing, please refer to enSilo's [AtomBombing: Brand New Code Injection for Windows](https://blog.ensilo.com/atombombing-brand-new-code-injection-for-windows).
+
+----
+
+## Section II: UnRunPE: A Proof-of-concept Code Detection for Process Hollowing
+
+
 
 ----
 
@@ -638,3 +670,4 @@ NTSTATUS NTAPI NtQueueApcThread(                        UINT WINAPI GlobalGetAto
 
 * [1] https://www.blackhat.com/presentations/bh-usa-06/BH-US-06-Sotirov.pdf
 * [2] https://www.codeproject.com/Articles/7914/MessageBoxTimeout-API
+* [3] https://blog.ensilo.com/atombombing-brand-new-code-injection-for-windows
