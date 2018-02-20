@@ -625,7 +625,7 @@ However, the underlying implementation of `NtQueueApcThread` allows for three po
 ```c
 NTSTATUS NTAPI NtQueueApcThread(                      UINT WINAPI GlobalGetAtomName(
     _In_     HANDLE           ThreadHandle,               // target process's thread
-    _In_     PIO_APC_ROUTINE  ApcRoutine,                 // APCProc (for GlobalGetAtomName)
+    _In_     PIO_APC_ROUTINE  ApcRoutine,                 // APCProc (GlobalGetAtomName)
     _In_opt_ PVOID            ApcRoutineContext,  ->      _In_  ATOM   nAtom,
     _In_opt_ PIO_STATUS_BLOCK ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
     _In_opt_ ULONG            ApcReserved                 _In_  int    nSize
