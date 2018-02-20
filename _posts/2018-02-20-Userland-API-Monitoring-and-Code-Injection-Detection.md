@@ -13,8 +13,8 @@ The following document is a result of self-research of malicious software (malwa
 
 ## Contents
 
-1. [Section I: Fundemental Concepts](#Section-I-Fundamental-Concepts)
-    * [Inline Hooking](#Inline-Hooking)
+1. [Section I: Fundemental Concepts](#section-i-fundamental-concepts)
+    * [Inline Hooking](#inline-hooking)
 
 ## Introduction
 
