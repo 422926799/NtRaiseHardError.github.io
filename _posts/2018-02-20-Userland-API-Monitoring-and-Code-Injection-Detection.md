@@ -11,6 +11,11 @@ The following document is a result of self-research of malicious software (malwa
 
 **Disclaimer**: Since this was a relatively accelerated project due to some time constraints, I would like to kindly apologise in advance for any potential misinformation that may be presented and would like to ask that I be notified as soon as possible so that it may revised. On top of this, the accompanying code may be under-developed for practical purposes and have unforseen design flaws.
 
+## Contents
+
+1. [Section I: Fundemental Concepts](# Section I: Fundamental Concepts)
+    * [Inline Hooking](## Inline Hooking)
+
 ## Introduction
 
 In the present day, malware are developed by cyber-criminals with the intent of compromising machines that may be leveraged to perform activities from which they can profit. For many of these activities, the malware must be able survive out in the wild, in the sense that they must operate covertly with all attempts to avert any attention from the victims of the infected and thwart detection by anti-virus software. Thus, the inception of stealth via code injection was the solution to this problem.
