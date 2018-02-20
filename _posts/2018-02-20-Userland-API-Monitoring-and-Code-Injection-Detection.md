@@ -590,7 +590,47 @@ To modify the starting address, the `Eax` member must be changed to the _virtual
 
 ### Atom Bombing
 
-The Atom Bombing is a code injection technique that takes advantage of global data storage via Windows Atoms.
+The Atom Bombing is a code injection technique that takes advantage of global data storage via  Windows's _global atom table_. The global atom table's data is accessible across all processes which is what makes it a viable approach. The data stored in the table is a null-terminated C-string type and is represented with a 16-bit integer key called the _atom_, similar to that of a map data structure. To add data, MSDN provides a [GlobalAddAtom](https://msdn.microsoft.com/en-us/library/windows/desktop/ms649060(v=vs.85).aspx) function and is defined as:
+
+```c
+ATOM WINAPI GlobalAddAtom(
+  _In_ LPCTSTR lpString
+);
+```
+
+where `lpString` is the data to be stored. The 16-bit integer atom is returned on a successful call. To retrieve the data stored in the global atom table, MSDN provides a [GlobalGetAtomName](https://msdn.microsoft.com/en-us/library/windows/desktop/ms649063(v=vs.85).aspx) defined as:
+
+```c
+UINT WINAPI GlobalGetAtomName(
+  _In_  ATOM   nAtom,
+  _Out_ LPTSTR lpBuffer,
+  _In_  int    nSize
+);
+```
+
+Passing in the identifying atom returned from `GlobalAddAtom` will place the data into `lpBuffer` and return the length of the string _excluding_ the null-terminator.
+
+Atom bombing works by forcing the target process to load and execute code placed within the global atom table and this relies on one other crucial function, `NtQueueApcThread`, which is lowest level userland call for `QueueUserAPC`. The reason why `NtQueueApcThread` is used over `QueueUserAPC` is because, as seen before, `QueueUserAPC`'s [APCProc](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681947(v=vs.85).aspx) only receives one parameter which is a parameter mismatch compared to `GlobalGetAtomName`.
+
+```c
+VOID CALLBACK APCProc(             UINT WINAPI GlobalGetAtomName(
+                                       _In_  ATOM   nAtom,
+  _In_ ULONG_PTR dwParam     ->        _Out_ LPTSTR lpBuffer,
+                                       _In_  int    nSize
+);                                 );
+```
+
+However, the underlying implementation of `NtQueueApcThread` allows for three potential parameters:
+
+```c
+NTSTATUS NTAPI NtQueueApcThread(                        UINT WINAPI GlobalGetAtomName(
+  _In_     HANDLE               ThreadHandle,           
+  _In_     PIO_APC_ROUTINE      ApcRoutine,                 // APCProc (for GlobalGetAtomName)
+  _In_opt_ PVOID                ApcRoutineContext,  ->      _In_  ATOM   nAtom,
+  _In_opt_ PIO_STATUS_BLOCK     ApcStatusBlock,             _Out_ LPTSTR lpBuffer,
+  _In_opt_ ULONG                ApcReserved                 _In_  int    nSize
+);                                                      );
+```
 
 ----
 
