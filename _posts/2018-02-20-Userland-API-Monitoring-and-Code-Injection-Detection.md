@@ -694,7 +694,7 @@ Once the necessary functions are hooked, the target process is executed and each
 
 ### UnRunPE Demonstration
 
-For the demonstration, I have chosen to use a trojanised executable that I had previously created as an experiment. It consists of the main executable `PEview.exe` and `PuTTY.exe` as the hidden executable.
+For the demonstration, I have chosen to use a trojanised binary that I had previously created as an experiment. It consists of the main executable `PEview.exe` and `PuTTY.exe` as the hidden executable.
 
 ![UnRunPE](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot%20from%202018-02-20%2018-35-29.png)
 
