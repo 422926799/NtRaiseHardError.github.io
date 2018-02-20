@@ -15,6 +15,19 @@ The following document is a result of self-research of malicious software (malwa
 
 1. [Section I: Fundemental Concepts](#section-i-fundamental-concepts)
     * [Inline Hooking](#inline-hooking)
+    * [API Monitoring](#api-monitoring)
+    * [Code Injection Primer](#code-injection-primer)
+        * [DLL Injection](#dll-injection)
+            * [CreateRemoteThread](#createremotethread)
+            * [SetWindowsHookEx](#setwindowshookex)
+            * [QueueUserAPC](#queueuserapc)
+        * [Process Hollowing](#process-hollowing)
+        * [Atom Bombing](#atom-bombing)
+2. [Section II: UnRunPE](#section-ii-unrunpe)
+    * [Code Injection Detection](#code-injection-detection)
+    * [Code Injection Dumping](#code-injection-dumping)
+    * [UnRunPE Demonstration](#unrunpe-demonstration)
+    
 
 ## Introduction
 
