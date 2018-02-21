@@ -733,7 +733,35 @@ Because there are so many methods of code injection, differentiating each techni
 * DLL: Code injected as DLLs
 
 ![process-injection](https://4.bp.blogspot.com/-ixv5E0LMZCw/WWi5yRjL-_I/AAAAAAAAAnk/WO99S4Yrd8w6lfg6tITwUV02CGDFYAORACLcBGAs/s1600/Process%2BInjection%25281%2529.png)
-(<sub>Process Injection Info Graphic<sup>[4]</sup> by [Karsten Hahn](https://twitter.com/struppigel)</sub>)
+<sub>Process Injection Info Graphic<sup>[4]</sup> by [Karsten Hahn](https://twitter.com/struppigel)</sub>
+
+Each trigger API is listed underneath _Execute_. When either of these APIs have been reached, Dreadought will perform a code dumping method that matches the assumed injection type in a similar fashion to what occurs with process hollowing in UnRunPE. Reliance on this is not enough because there is still potential for API calls to be mixed around to achieve the same functionality as displayed from the stemming of arrows.
+
+## Heuristics
+
+For Dreadnought to be able to determine code injection methods more accurately, a heuristic should be involved as an assist. In the development, a very simplistic heuristic was applied. Following the process injection infographic, every time an API was hooked, it would increase the weight of one or more of the associated code injection types stored within a map data structure. As it traces each API call, it will start to favour a certain type. Once the trigger API has been entered, it will identify and compare the weights of the relevant types and proceed with an appropriate action.
+
+## Demonstration
+
+### Process Hollowing
+
+![process-hollowing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-14-46.png)
+
+### DLL Injection - SetWindowsHookEx
+
+![setwindowshookex](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-15-35.png)
+
+### DLL Injection - QueueUserAPC
+
+![queueuserapc](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-16-17.png)
+
+### Atom Bombing
+
+![atombombing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-24-43.png)
+
+![atombombing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-25-09.png)
+
+![atombombing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot from 2018-02-21 20-29-30.png)
 
 ----
 
