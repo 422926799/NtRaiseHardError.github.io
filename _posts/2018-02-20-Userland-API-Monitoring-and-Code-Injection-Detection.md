@@ -111,7 +111,7 @@ versus the hooked function:
 C3              ret
 ```
 
-Here I have opted to use the `push-ret` combination instead of an absolute `jmp` due to my past experiences of it not being reliable for reasons I have yet to discover. `xx xx xx xx` represents the little-endian byte-order address of `HookedMessageBox`.
+Here I have opted to use the `push-ret` combination instead of an absolute `jmp` due to my past experiences of it not being reliable for reasons to be discovered. `xx xx xx xx` represents the little-endian byte-order address of `HookedMessageBox`.
 
 2. Capturing the function call
 
@@ -721,7 +721,19 @@ For the demonstration, I have chosen to use a trojanised binary that I had previ
 
 # Section III: Dreadnought
 
-...
+Dreadnought is a PoC tool that was built upon UnRunPE to support a wider variety of code injection detection, namely, those listed in [Code Injection Primer](#code-injection-primer). To engineer such an application, a few augmentations are required.
+
+## Detecting Code Injection Method
+
+Because there are so many methods of code injection, differentiating each technique was a necessity. The first approach to this was to recognise a "trigger" API call, that is, the API call which would peform the remote execution of the payload. Using this would do two things: identify the completion of and, to an extent, the type of the code injection. The _type_ can be categorised into four groups:
+
+* Section: Code injected as/into a section
+* Process: Code injected into a process
+* Code: Generic code injection or shellcode
+* DLL: Code injected as DLLs
+
+![process-injection](https://4.bp.blogspot.com/-ixv5E0LMZCw/WWi5yRjL-_I/AAAAAAAAAnk/WO99S4Yrd8w6lfg6tITwUV02CGDFYAORACLcBGAs/s1600/Process%2BInjection%25281%2529.png)
+(<sub>Process Injection Info Graphic<sup>[4]</sup> by [Karsten Hahn](https://twitter.com/struppigel)</sub>)
 
 ----
 
@@ -730,3 +742,4 @@ For the demonstration, I have chosen to use a trojanised binary that I had previ
 * [1] https://www.blackhat.com/presentations/bh-usa-06/BH-US-06-Sotirov.pdf
 * [2] https://www.codeproject.com/Articles/7914/MessageBoxTimeout-API
 * [3] https://blog.ensilo.com/atombombing-brand-new-code-injection-for-windows
+* [4] http://struppigel.blogspot.com.au/2017/07/process-injection-info-graphic.html
