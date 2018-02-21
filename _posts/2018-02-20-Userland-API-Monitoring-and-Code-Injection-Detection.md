@@ -787,3 +787,10 @@ For Dreadnought to be able to determine code injection methods more accurately, 
 * [2] https://www.codeproject.com/Articles/7914/MessageBoxTimeout-API
 * [3] https://blog.ensilo.com/atombombing-brand-new-code-injection-for-windows
 * [4] http://struppigel.blogspot.com.au/2017/07/process-injection-info-graphic.html
+
+* [ReactOs](https://www.reactos.org/)
+* [NTAPI Undocumented Functions](https://undocumented.ntinternals.net/)
+* [ntcoder](http://ntcoder.com/category/undocumented-winapi/)
+* [GitHub - Process Hacker](https://github.com/processhacker/processhacker)
+* [YouTube - MalwareAnalysisForHedgehogs](https://www.youtube.com/channel/UCVFXrUwuWxNlm6UNZtBLJ-A)
+* [YouTube - OALabs](https://www.youtube.com/channel/UC--DwaiMV-jtO-6EvmKOnqg)
