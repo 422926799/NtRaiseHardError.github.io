@@ -37,6 +37,7 @@ The following document is a result of self-research of malicious software (malwa
         * [DLL Injection - QueueUserAPC](#dll-injection-queueuserapc)
         * [Code Injection - Atom Bombing](#code-injection-atom-bombing)
 5. [Conclusion](#conclusion)
+    * [Limitations](#limitations)
 6. [References](#references)
     
 
@@ -777,7 +778,13 @@ For Dreadnought to be able to determine code injection methods more accurately, 
 
 # Conclusion
 
-...
+This paper aimed to bring a technical understanding of code injection and its interaction with the WinAPI. Furthermore, the concept of API monitoring in userland was entertained with the malicious use of injection methods utilised by malware to bypass anti-virus detection. The following presents the current status of Dreadnought as of this writing.
+
+## Limitations
+
+Dreadnought's current heuristic and detection design is incredibly poor but was sufficient enough for theoretical demonstration purposes. Practical use may not be ideal since there is a high possibility that there will be collateral with respect to the hooked API calls during regular operations with the operating system. Because of the impossibility to discern benign from malicious behaviour, false positives and negatives may arise as a result. 
+
+With regards to Dreadnought and its operations within userland, it may not be ideal use when dealing with sophisticated malware, especially those which have access to direct interactions with the kernel and those which have the capabilities to evade hooks in general.
 
 ----
 
