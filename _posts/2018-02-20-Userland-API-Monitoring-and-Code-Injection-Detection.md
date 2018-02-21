@@ -13,7 +13,8 @@ The following document is a result of self-research of malicious software (malwa
 
 ## Contents
 
-1. [Section I: Fundemental Concepts](#section-i-fundamental-concepts)
+1. [Introduction](#introduction)
+2. [Section I: Fundemental Concepts](#section-i-fundamental-concepts)
     * [Inline Hooking](#inline-hooking)
     * [API Monitoring](#api-monitoring)
     * [Code Injection Primer](#code-injection-primer)
@@ -23,11 +24,20 @@ The following document is a result of self-research of malicious software (malwa
             * [QueueUserAPC](#queueuserapc)
         * [Process Hollowing](#process-hollowing)
         * [Atom Bombing](#atom-bombing)
-2. [Section II: UnRunPE](#section-ii-unrunpe)
+3. [Section II: UnRunPE](#section-ii-unrunpe)
     * [Code Injection Detection](#code-injection-detection)
     * [Code Injection Dumping](#code-injection-dumping)
     * [UnRunPE Demonstration](#unrunpe-demonstration)
-3. [Section III: Dreadnought](#section-iii-dreadnought)
+4. [Section III: Dreadnought](#section-iii-dreadnought)
+    * [Detecting Code Injection Method](#detecting-code-injection-method)
+    * [Heuristics](#heuristics)
+    * [Dreadnought Demonstration](#dreadnought-demonstration)
+        * [Process Injection - Process Hollowing](#process-injection-process-hollowing)
+        * [DLL Injection - SetWindowsHookEx](#dll-injection-setwindowshookex)
+        * [DLL Injection - QueueUserAPC](#dll-injection-queueuserapc)
+        * [Code Injection - Atom Bombing](#code-injection-atom-bombing)
+5. [Conclusion](#conclusion)
+6. [References](#references)
     
 
 ## Introduction
@@ -741,9 +751,9 @@ Each trigger API is listed underneath _Execute_. When either of these APIs have 
 
 For Dreadnought to be able to determine code injection methods more accurately, a heuristic should be involved as an assist. In the development, a very simplistic heuristic was applied. Following the process injection infographic, every time an API was hooked, it would increase the weight of one or more of the associated code injection types stored within a map data structure. As it traces each API call, it will start to favour a certain type. Once the trigger API has been entered, it will identify and compare the weights of the relevant types and proceed with an appropriate action.
 
-## Demonstration
+## Dreadnought Demonstration
 
-### Process Hollowing
+### Process Injection - Process Hollowing
 
 ![process-hollowing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot%20from%202018-02-21%2020-14-46.png)
 
@@ -755,7 +765,7 @@ For Dreadnought to be able to determine code injection methods more accurately, 
 
 ![queueuserapc](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot%20from%202018-02-21%2020-16-17.png)
 
-### Atom Bombing
+### Code Injection - Atom Bombing
 
 ![atombombing](/images/2018-02-21-Userland-API-Monitoring-and-Code-Injection-Detection/Screenshot%20from%202018-02-21%2020-24-43.png)
 
@@ -765,7 +775,13 @@ For Dreadnought to be able to determine code injection methods more accurately, 
 
 ----
 
-# References:
+# Conclusion
+
+...
+
+----
+
+# References
 
 * [1] https://www.blackhat.com/presentations/bh-usa-06/BH-US-06-Sotirov.pdf
 * [2] https://www.codeproject.com/Articles/7914/MessageBoxTimeout-API
